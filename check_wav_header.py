@@ -15,5 +15,5 @@ def check_wav_header(file_path):
             print("파일 헤더가 올바르지 않습니다.")
 
 if __name__ == "__main__":
-    file_path = r"C:\My-Portfolio\voskProject\backend\media\uploads\recording_converted.wav"  # 실제 파일 경로로 변경
+    file_path = r"D:\develop\AIPronunciation\backend\media\uploads\recording_converted.wav"  # 실제 파일 경로로 변경
     check_wav_header(file_path)

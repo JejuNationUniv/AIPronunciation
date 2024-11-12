@@ -41,10 +41,11 @@ def load_sentences_from_db(db_config):
 
 # MySQL 데이터베이스 접속 정보
 db_config = {
-    "host": "localhost",
-    "user": "your_username",   # 실제 MySQL 사용자 이름으로 변경
-    "password": "your_password", # 실제 비밀번호로 변경
-    "database": "your_database"  # 실제 데이터베이스 이름으로 변경
+    "host": "localhost",  # 3306이 아닌 localhost로 수정
+    "port": 3306,        # port는 별도로 지정
+    "user": "root",
+    "password": "1388",
+    "database": "vosk_voice"
 }
 
 # 데이터베이스에서 문장과 레이블 불러오기
