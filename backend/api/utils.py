@@ -12,7 +12,7 @@ model = Model(os.path.join(settings.MEDIA_ROOT, 'models', 'vosk-model-small-ko-0
 
 def convert_webm_to_wav(input_path, output_path):
     try:
-        ffmpeg_path = r"C:\ffmpeg\ffmpeg-7.1-full_build\bin\ffmpeg.exe"  # FFmpeg 실행 파일의 전체 경로로 변경
+        ffmpeg_path = r"D:\develop\ffmpeg-7.1-full_build\bin\ffmpeg.exe"  # FFmpeg 실행 파일의 전체 경로로 변경
         command = [
             ffmpeg_path,
             '-y',  # 기존 파일 덮어쓰기
@@ -64,11 +64,14 @@ def vosk_speech_to_text(input_path):
                 break
             if rec.AcceptWaveform(data):
                 result = json.loads(rec.Result())
+                print("중간 결과:", result)  # 중간 결과 출력
                 transcript += result.get('text', '') + " "
         # 마지막 결과
         result = json.loads(rec.FinalResult())
+        print("최종 결과:", result)  # 최종 결과 출력
         transcript += result.get('text', '')
         return transcript.strip()
     except Exception as e:
         print("Vosk 오류:", e)
         return ""
+
