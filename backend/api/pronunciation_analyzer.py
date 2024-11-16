@@ -33,7 +33,7 @@ def generate_readable_comparison(original_tokens, user_tokens):
     for i, orig_word in enumerate(original_tokens):
         # 정확히 같은 위치에 같은 단어가 있는 경우
         if i < len(user_tokens) and orig_word == user_tokens[i]:
-            result_parts.append(f"{orig_word}(O)")
+            result_parts.append(f"{orig_word}(<span style='color: blue;'>O</span>)")
             used_user_indices.add(i)
             continue
         
@@ -46,28 +46,29 @@ def generate_readable_comparison(original_tokens, user_tokens):
         
         if found_idx != -1:
             # 순서만 다른 경우
-            result_parts.append(f"{orig_word}(순서변경)")
+            result_parts.append(f"{orig_word}(<span style='color: red;'>순서변경</span>)")
             used_user_indices.add(found_idx)
         else:
             # 해당 위치에 다른 단어가 있는 경우
             if i < len(user_tokens):
                 wrong_word = user_tokens[i]
                 if i not in used_user_indices:
-                    result_parts.append(f"{orig_word}({wrong_word})")
+                    result_parts.append(f"{orig_word}(<span style='color: red;'>{wrong_word}</span>)")
                     used_user_indices.add(i)
                 else:
-                    result_parts.append(f"{orig_word}(누락)")
+                    result_parts.append(f"{orig_word}(<span style='color: red;'>누락</span>)")
             else:
-                result_parts.append(f"{orig_word}(누락)")
+                result_parts.append(f"{orig_word}(<span style='color: red;'>누락</span>)")
     
     # 사용되지 않은 사용자 발화 단어들은 추가된 것
     extra_words = [word for i, word in enumerate(user_tokens) if i not in used_user_indices]
     
     result = ' '.join(result_parts)
     if extra_words:
-        result += f" (추가: {', '.join(extra_words)})"
+        result += f" (추가: <span style='color: red;'>{', '.join(extra_words)}</span>)"
     
     return result
+
 
 def compare_with_latest_voice(db_config, original_id=1):
     try:
