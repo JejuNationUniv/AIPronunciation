@@ -1,5 +1,3 @@
-# api/utils.py
-
 from vosk import Model, KaldiRecognizer
 import json
 import wave
@@ -44,18 +42,18 @@ def vosk_speech_to_text(input_path):
         if input_path.lower().endswith('.webm'):
             converted_path = os.path.splitext(input_path)[0] + "_converted.wav"
             if convert_webm_to_wav(input_path, converted_path):
-                print("파일 변환 성공:", converted_path)
+                print("파일 WAV 변환 성공:", converted_path)
                 wf = wave.open(converted_path, "rb")
             else:
                 print("파일 변환 실패.")
-                return ""
+                return "", ""
         else:
             wf = wave.open(input_path, "rb")
 
         # 오디오 파일 형식 검증
         if wf.getnchannels() != 1 or wf.getsampwidth() != 2 or wf.getframerate() != 16000:
             print("오디오 파일 형식이 올바르지 않습니다.")
-            return ""
+            return "", ""
 
         rec = KaldiRecognizer(model, wf.getframerate())
         transcript = ""
@@ -71,8 +69,7 @@ def vosk_speech_to_text(input_path):
         result = json.loads(rec.FinalResult())
         print("최종 결과:", result)  # 최종 결과 출력
         transcript += result.get('text', '')
-        return transcript.strip()
+        return transcript.strip(), converted_path
     except Exception as e:
         print("Vosk 오류:", e)
-        return ""
-
+        return "", ""
