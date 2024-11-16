@@ -6,13 +6,14 @@ import wave
 import os
 import subprocess
 from django.conf import settings
+from decouple import config
 
 # Vosk 모델 초기화 (애플리케이션 시작 시 한 번만 수행)
 model = Model(os.path.join(settings.MEDIA_ROOT, 'models', 'vosk-model-small-ko-0.22'))
 
 def convert_webm_to_wav(input_path, output_path):
     try:
-        ffmpeg_path = r"D:\develop\ffmpeg-7.1-full_build\bin\ffmpeg.exe"  # FFmpeg 실행 파일의 전체 경로로 변경
+        ffmpeg_path = config('FFMPEG_PATH', default='ffmpeg')  # 환경 변수 또는 .env 파일에서 경로 가져오기
         command = [
             ffmpeg_path,
             '-y',  # 기존 파일 덮어쓰기
