@@ -34,7 +34,3 @@ yarn-error.log*
 .DS_Store
 *.swp
 *.swo
-
-# AIPronunciation 무시
-AIPronunciation/.git
-
