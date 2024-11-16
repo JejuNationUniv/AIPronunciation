@@ -12,6 +12,7 @@ function TestPage() {
   const [readableResult, setReadableResult] = useState(""); // readable_result 사용
   const [isLoading, setIsLoading] = useState(false);
   const [originalText, setOriginalText] = useState("");
+  const [audioUrl, setAudioUrl] = useState(null); // 오디오 파일 URL 상태 추가
 
   // 원본 텍스트 가져오기
   useEffect(() => {
@@ -34,12 +35,21 @@ function TestPage() {
     setRecord(true);
     setTranscript("");
     setReadableResult("");
+
+    // 여기에 사용자 제스처 이후 AudioContext를 생성하는 방식이 가능함.
+    if (typeof AudioContext !== "undefined") {
+      const audioContext = new AudioContext();
+      audioContext.resume().then(() => {
+        console.log("AudioContext가 활성화되었습니다.");
+      });
+    }
   };
 
   const stopRecording = () => {
     setRecord(false);
   };
 
+  // 중복된 onStop 함수 중 하나를 제거했습니다.
   const onStop = async (recordedBlob) => {
     const formData = new FormData();
     formData.append("audio_file", recordedBlob.blob, "recording.webm");
@@ -56,6 +66,7 @@ function TestPage() {
       if (response.data) {
         setTranscript(response.data.text || "");
         setReadableResult(response.data.readable_result || ""); // readable_result 사용
+        setAudioUrl("http://127.0.0.1:8000" + response.data.audio_url); // 서버에서 반환된 오디오 파일 URL 저장
       }
     } catch (error) {
       console.error("오류 발생:", error);
@@ -69,6 +80,20 @@ function TestPage() {
     }
   };
 
+  const playAudio = () => {
+    if (audioUrl) {
+      const audio = new Audio(audioUrl);
+      audio.play().catch((error) => {
+        console.error("오디오 재생 오류:", error);
+        alert(
+          "오디오를 재생할 수 없습니다. 파일 형식이나 접근 권한을 확인하세요.",
+        );
+      });
+    } else {
+      alert("재생할 오디오가 없습니다.");
+    }
+  };
+
   return (
     <div className="flex min-h-screen justify-center bg-[#E7ECF2] font-Pretendard">
       <div className="relative flex w-[500px] justify-center bg-white lg:m-5 lg:w-screen lg:rounded-2xl">
@@ -79,7 +104,7 @@ function TestPage() {
           </div>
 
           {/* 메인 영역 */}
-          <div className="mt-25 text-25 mt-10 font-light lg:text-2xl">1/5</div>
+          <div className="mt-25 text-25 mt-10 font-light lg:text-2xl">1/3</div>
 
           {/* 문장 제시 영역 */}
           <div className="w-408 lg:w-888 mt-6 flex items-center justify-center rounded-2xl bg-[#F2F2F2] p-5 shadow-lg">
@@ -110,6 +135,15 @@ function TestPage() {
                     ? transcript
                     : "녹음 시작 버튼을 눌러 발음 테스트를 시작하세요."}
               </p>
+              <button
+                onClick={playAudio}
+                disabled={!audioUrl} // 오디오가 없으면 버튼 비활성화
+                className={`text-blue-500 underline hover:text-blue-700 ${
+                  !audioUrl ? "cursor-not-allowed text-gray-400" : ""
+                }`}
+              >
+                발음 듣기
+              </button>
             </div>
 
             <hr className="mx-3 border-t-2 border-gray-300" />

@@ -42,8 +42,8 @@ class SpeechToTextView(APIView):
                     f.write(chunk)
             print(f"파일 저장됨: {input_path}")
             
-            # 음성 인식
-            transcript = vosk_speech_to_text(input_path)
+            # 음성 인식 및 MP3 파일 생성
+            transcript, mp3_path = vosk_speech_to_text(input_path)
             if not transcript:
                 return Response({'error': '음성 인식 실패'}, status=status.HTTP_400_BAD_REQUEST)
             print(f"음성 인식 결과: {transcript}")
@@ -52,6 +52,12 @@ class SpeechToTextView(APIView):
             voice_text = VoiceTexts.objects.create(text=transcript)
             print(f"DB 저장 ID: {voice_text.id}")
             
+            # MP3 파일 URL 생성
+            if mp3_path:
+                audio_url = os.path.join(settings.MEDIA_URL, 'uploads', os.path.basename(mp3_path))
+            else:
+                audio_url = None
+
             try:
                 original = OriginText.objects.get(id=1)
                 original_text = original.text
@@ -69,9 +75,10 @@ class SpeechToTextView(APIView):
                 
                 response_data = {
                     'text': transcript,
-                    'readable_result': readable_result,  # 여기에서 readable_result로 보냄
+                    'readable_result': readable_result,
                     'original_text': original_text,
-                    'voice_text_id': voice_text.id
+                    'voice_text_id': voice_text.id,
+                    'audio_url': audio_url  # 변환된 MP3 파일의 URL
                 }
                 print(f"응답 데이터: {response_data}")
                 
@@ -82,12 +89,15 @@ class SpeechToTextView(APIView):
                 return Response({
                     'text': transcript,
                     'voice_text_id': voice_text.id,
+                    'audio_url': audio_url,
                     'error': '원본 텍스트를 찾을 수 없습니다.'
                 }, status=status.HTTP_200_OK)
             
         print(f"유효성 검사 실패: {serializer.errors}")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class TestView(APIView):
     def get(self, request, *args, **kwargs):
         return JsonResponse({'message': 'API is working!'})
+
