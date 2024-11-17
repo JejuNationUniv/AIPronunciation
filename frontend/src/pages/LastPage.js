@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-const MainPage = () => {
+const LastPage = () => {
   const navigate = useNavigate();
 
   const Title = ({ children, className }) => (
@@ -31,22 +31,22 @@ const MainPage = () => {
 
         {/* 메인 영역 */}
         <div className="mt-60 flex flex-col items-center justify-center py-10">
-          <Title className="text-center lg:hidden">AI Pronunciation</Title>
-          <Title className="text-center lg:hidden">Assistant</Title>
+          <Title className="text-center lg:hidden">당신의 발음은</Title>
+          <Title className="text-center lg:hidden">상위 10% 입니다!</Title>
           <div className="hidden text-center lg:block lg:font-Pretendard lg:text-[40px] lg:font-[700]">
-            AI Pronunciation Assistant
+            당신의 발음은 상위 10% 입니다!
           </div>
-          <div className="mt-5 font-Pretendard text-[20px] font-[500]">
-            AI 발음 교정 서비스
+          <div className="mt-5 font-Pretendard text-[18px] font-[500]">
+            열심히 연습하면 더 좋아질 거에요!
           </div>
 
           {/* 하단 영역 (버튼) */}
           <div className="absolute bottom-[80px] mx-14">
             <button
               className="h-[56px] w-[392px] rounded-2xl bg-slate-800 font-Pretendard text-[20px] font-[700] text-white"
-              onClick={() => navigate("/TestPage")}
+              onClick={() => navigate("/")}
             >
-              발음 테스트 시작하기
+              다시 도전하기!
             </button>
           </div>
         </div>
@@ -55,4 +55,4 @@ const MainPage = () => {
   );
 };
 
-export default MainPage;
+export default LastPage;
