@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ReactMic } from "react-mic";
 import axios from "axios";
 import "../css/TestPage.css";
+import playButton from "../imgs/playbutton.svg";
 
 function TestPage() {
   const navigate = useNavigate();
@@ -135,15 +136,6 @@ function TestPage() {
                     ? transcript
                     : "녹음 시작 버튼을 눌러 발음 테스트를 시작하세요."}
               </p>
-              <button
-                onClick={playAudio}
-                disabled={!audioUrl} // 오디오가 없으면 버튼 비활성화
-                className={`text-blue-500 underline hover:text-blue-700 ${
-                  !audioUrl ? "cursor-not-allowed text-gray-400" : ""
-                }`}
-              >
-                발음 듣기
-              </button>
             </div>
 
             <hr className="mx-3 border-t-2 border-gray-300" />
@@ -162,6 +154,20 @@ function TestPage() {
               )}
             </div>
           </div>
+          <button
+            onClick={playAudio}
+            disabled={!audioUrl}
+            className={`flex text-blue-500 underline hover:text-blue-700 ${!audioUrl ? "cursor-not-allowed" : ""} ${!audioUrl ? "opacity-10" : ""}`}
+          >
+            <img
+              src={playButton}
+              alt="발음 듣기 버튼"
+              width="25"
+              height="25"
+              style={{ marginRight: "8px" }}
+            />{" "}
+            내 발음 다시 듣기
+          </button>
 
           {/* 하단 버튼 영역 */}
           <div className="absolute bottom-[87px] mx-14 flex space-x-24">
