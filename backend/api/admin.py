@@ -1,3 +1,5 @@
 from django.contrib import admin
+from .models import OriginText, VoiceTexts
 
-# Register your models here.
+admin.site.register(OriginText)
+admin.site.register(VoiceTexts)
