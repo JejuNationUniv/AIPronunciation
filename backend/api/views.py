@@ -14,8 +14,9 @@ okt = Okt()
 
 class OriginTextView(APIView):
     def get(self, request):
+        text_id = request.query_params.get('id', 1)  # 쿼리 파라미터에서 ID 가져오기, 기본값 1
         try:
-            origin_text = OriginText.objects.get(id=1)
+            origin_text = OriginText.objects.get(id=text_id)
             return Response({
                 'text': origin_text.text
             }, status=status.HTTP_200_OK)
@@ -23,6 +24,7 @@ class OriginTextView(APIView):
             return Response({
                 'error': '원본 텍스트를 찾을 수 없습니다.'
             }, status=status.HTTP_404_NOT_FOUND)
+
 
 class SpeechToTextView(APIView):
     def post(self, request, format=None):
