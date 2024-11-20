@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ReactMic } from "react-mic"; // ReactMic 임포트
 import axios from "axios";
-import "./App.css";
+//import "./App.css";
 
 function App() {
   const navigate = useNavigate();

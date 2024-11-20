@@ -20,3 +20,12 @@ class OriginText(models.Model):
 
     def __str__(self):
         return f"Origin Voice {self.id}"
+    
+# LastPage 위한 Models(정확도)
+class PronunciationAccuracy(models.Model):
+    text = models.CharField(max_length=50)
+    accuracy = models.FloatField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']  # 최신순 정렬
