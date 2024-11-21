@@ -90,7 +90,7 @@ class SpeechToTextView(APIView):
                     if word in transcript_words:
                         colored_text += f'<span style="color:black">{word}</span> '
                     else:
-                        colored_text += f'<span style="color:blue">{word}</span> '
+                        colored_text += f'<span style="color:purple">{word}</span> '
 
                 for word in transcript_words:
                     if word not in set(most_similar.split()):
