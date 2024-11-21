@@ -6,8 +6,17 @@ import GaugeChart from "react-gauge-chart";
 const LastPage = () => {
   const navigate = useNavigate();
   const [accuracy, setAccuracy] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // 초기 로딩 상태를 true로 설정
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    // 2초 동안 로딩 상태 유지
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const fetchAccuracy = async () => {
@@ -69,59 +78,59 @@ const LastPage = () => {
 
   return (
     <div className="flex min-h-screen justify-center bg-[#E7ECF2]">
-      {isLoading && (
+      {isLoading ? (
         <div className="loading-overlay">
           <div className="loading-spinner"></div>
         </div>
-      )}
-      {/* Main Container */}
-      <div className="relative w-full max-w-lg overflow-hidden bg-white p-4 shadow-lg lg:mx-5 lg:my-5 lg:max-w-none lg:overflow-visible lg:rounded-lg">
-        {/* 메인 영역 */}
-        <div className="mt-40 flex flex-col items-center justify-center py-10">
-          {/* 게이지 차트 */}
-          <div className="mb-4 flex justify-center">
-            <GaugeChart
-              id="accuracy-gauge"
-              nrOfLevels={20}
-              percent={accuracy / 100}
-              textColor="#000000"
-              width={300} // 또는 style={{ width: "300px", height: "150px" }}
-              hideText={true}
-            />
-          </div>
+      ) : (
+        <div className="relative w-full max-w-lg overflow-hidden bg-white p-4 shadow-lg lg:mx-5 lg:my-5 lg:max-w-none lg:overflow-visible lg:rounded-lg">
+          {/* 메인 영역 */}
+          <div className="mt-40 flex flex-col items-center justify-center py-10">
+            {/* 게이지 차트 */}
+            <div className="mb-4 flex justify-center">
+              <GaugeChart
+                id="accuracy-gauge"
+                nrOfLevels={20}
+                percent={accuracy / 100}
+                textColor="#000000"
+                width={300} // 또는 style={{ width: "300px", height: "150px" }}
+                hideText={true}
+              />
+            </div>
 
-          {/* 발음 정확도 */}
-          <Title className="text-center lg:hidden">당신의 발음은</Title>
-          <Title className="text-center lg:hidden">
-            상위 {(100 - accuracy).toFixed(2)}% 입니다!
-          </Title>
-          <div className="hidden text-center lg:block lg:font-Pretendard lg:text-[50px] lg:font-[700]">
-            당신의 발음은 상위 {(100 - accuracy).toFixed(2)}% 입니다!
-          </div>
-          <div className="mt-5 font-Pretendard text-[20px] font-[500]">
-            {getMessage()}
-          </div>
+            {/* 발음 정확도 */}
+            <Title className="text-center lg:hidden">당신의 발음은</Title>
+            <Title className="text-center lg:hidden">
+              상위 {(100 - accuracy).toFixed(2)}% 입니다!
+            </Title>
+            <div className="hidden text-center lg:block lg:font-Pretendard lg:text-[50px] lg:font-[700]">
+              당신의 발음은 상위 {(100 - accuracy).toFixed(2)}% 입니다!
+            </div>
+            <div className="mt-5 font-Pretendard text-[20px] font-[500]">
+              {getMessage()}
+            </div>
 
-          {/* 하단 영역 (버튼) */}
-          <div className="absolute bottom-[80px] mx-14 flex space-x-4">
-            <button
-              className={`h-[56px] w-[192px] rounded-lg bg-slate-800 font-Pretendard text-[20px] font-[700] text-white hover:bg-blue-600 ${
-                isLoading ? "cursor-not-allowed opacity-50" : ""
-              }`}
-              onClick={handleReset}
-              disabled={isLoading}
-            >
-              {isLoading ? "이동중..." : "다시 도전하기!"}
-            </button>
-            <button
-              className="h-[56px] w-[192px] rounded-lg bg-gray-500 font-Pretendard text-[20px] font-[700] text-white hover:bg-gray-600"
-              onClick={openModal}
-            >
-              더 연습하러 가기
-            </button>
+            {/* 하단 영역 (버튼) */}
+            <div className="absolute bottom-[80px] mx-14 flex space-x-4">
+              <button
+                className={`h-[56px] w-[192px] rounded-lg bg-slate-800 font-Pretendard text-[20px] font-[700] text-white hover:bg-blue-600 ${
+                  isLoading ? "cursor-not-allowed opacity-50" : ""
+                }`}
+                onClick={handleReset}
+                disabled={isLoading}
+              >
+                {isLoading ? "이동중..." : "다시 도전하기!"}
+              </button>
+              <button
+                className="h-[56px] w-[192px] rounded-lg bg-gray-500 font-Pretendard text-[20px] font-[700] text-white hover:bg-gray-600"
+                onClick={openModal}
+              >
+                더 연습하러 가기
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* 모달 창 */}
       {isModalOpen && (
