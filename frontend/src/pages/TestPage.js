@@ -16,6 +16,7 @@ function TestPage() {
   const [audioUrl, setAudioUrl] = useState(null); // 오디오 파일 URL 상태 추가
   const [currentTextId, setCurrentTextId] = useState(1);
   const [isLastText, setIsLastText] = useState(false);
+  const totalTexts = 3;
 
   // 원본 텍스트 가져오기
   useEffect(() => {
@@ -29,9 +30,14 @@ function TestPage() {
       );
       if (response.data && response.data.text) {
         setOriginalText(response.data.text);
-        setIsLastText(false);
       } else {
         setIsLastText(true);
+      }
+      // 마지막 문장인 경우 `isLastText` 값을 true로 설정합니다.
+      if (id === totalTexts) {
+        setIsLastText(true);
+      } else {
+        setIsLastText(false);
       }
     } catch (error) {
       console.error("원본 텍스트 가져오기 실패:", error);
@@ -115,9 +121,15 @@ function TestPage() {
       setCurrentTextId((prevId) => prevId + 1);
     }
   };
-
   return (
     <div className="flex min-h-screen justify-center bg-[#E7ECF2]">
+      {/* 로딩 중일 때 오버레이 표시 */}
+      {isLoading && (
+        <div className="loading-overlay">
+          <div className="loading-spinner"></div>
+        </div>
+      )}
+
       {/* Main Container */}
       <div className="relative w-full max-w-lg overflow-hidden bg-white p-4 shadow-lg lg:mx-5 lg:my-5 lg:max-w-none lg:overflow-visible lg:rounded-lg">
         {/* Top Icons */}
@@ -137,7 +149,9 @@ function TestPage() {
 
         {/* 메인 영역 */}
         <div className="flex flex-col items-center justify-center py-10">
-          <div className="text-25 mt-10 font-light lg:text-2xl">1/3</div>
+          <div className="text-25 mt-10 font-light lg:text-2xl">
+            {currentTextId}/{totalTexts}
+          </div>
 
           {/* 문장 제시 영역 */}
           <div className="mt-10 flex w-96 items-center justify-center rounded-lg bg-[#F2F2F2] p-5 shadow-lg lg:w-5/12">
