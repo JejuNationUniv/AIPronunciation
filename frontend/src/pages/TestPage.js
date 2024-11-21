@@ -14,23 +14,30 @@ function TestPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [originalText, setOriginalText] = useState("");
   const [audioUrl, setAudioUrl] = useState(null); // 오디오 파일 URL 상태 추가
+  const [currentTextId, setCurrentTextId] = useState(1);
+  const [isLastText, setIsLastText] = useState(false);
 
   // 원본 텍스트 가져오기
   useEffect(() => {
-    const fetchOriginalText = async () => {
-      try {
-        const response = await axios.get(
-          "http://127.0.0.1:8000/api/speech-to-text/original/",
-        );
-        if (response.data && response.data.text) {
-          setOriginalText(response.data.text);
-        }
-      } catch (error) {
-        console.error("원본 텍스트 가져오기 실패:", error);
+    fetchOriginalText(currentTextId);
+  }, [currentTextId]);
+
+  const fetchOriginalText = async (id) => {
+    try {
+      const response = await axios.get(
+        `http://127.0.0.1:8000/api/speech-to-text/original/?id=${id}`,
+      );
+      if (response.data && response.data.text) {
+        setOriginalText(response.data.text);
+        setIsLastText(false);
+      } else {
+        setIsLastText(true);
       }
-    };
-    fetchOriginalText();
-  }, []);
+    } catch (error) {
+      console.error("원본 텍스트 가져오기 실패:", error);
+      setIsLastText(true); // 오류가 발생해도 마지막 텍스트로 간주
+    }
+  };
 
   const startRecording = () => {
     setRecord(true);
@@ -92,6 +99,20 @@ function TestPage() {
       });
     } else {
       alert("재생할 오디오가 없습니다.");
+    }
+  };
+
+  // 다음 문장 또는 결과 확인 버튼 핸들러
+  const handleNextOrResult = () => {
+    if (isLastText) {
+      // 마지막 문장이면 결과 확인 페이지로 이동
+      navigate("/LastPage");
+    } else {
+      // 다음 문장으로 넘어가기 전에 발음 결과 초기화
+      setTranscript("");
+      setReadableResult("");
+      setAudioUrl(null); // 오디오 URL도 초기화하여 다시 듣기 버튼을 비활성화
+      setCurrentTextId((prevId) => prevId + 1);
     }
   };
 
@@ -210,10 +231,10 @@ function TestPage() {
               새로고침
             </button>
             <button
-              onClick={() => navigate("/LastPage")}
+              onClick={handleNextOrResult}
               className="rounded bg-pink-500 px-4 py-2 text-white hover:bg-pink-600"
             >
-              결과 확인
+              {isLastText ? "결과 확인" : "다음 문장"}
             </button>
           </div>
 
