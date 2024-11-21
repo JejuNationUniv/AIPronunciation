@@ -13,9 +13,10 @@ function TestPage() {
   const [readableResult, setReadableResult] = useState(""); // readable_result 사용
   const [isLoading, setIsLoading] = useState(false);
   const [originalText, setOriginalText] = useState("");
-  const [audioUrl, setAudioUrl] = useState(null);
+  const [audioUrl, setAudioUrl] = useState(null); // 오디오 파일 URL 상태 추가
   const [currentTextId, setCurrentTextId] = useState(1);
   const [isLastText, setIsLastText] = useState(false);
+  const totalTexts = 3;
 
   // 원본 텍스트 가져오기
   useEffect(() => {
@@ -29,13 +30,17 @@ function TestPage() {
       );
       if (response.data && response.data.text) {
         setOriginalText(response.data.text);
-        setIsLastText(false);
       } else {
         setIsLastText(true);
       }
+      if (id === totalTexts) {
+        setIsLastText(true);
+      } else {
+        setIsLastText(false);
+      }
     } catch (error) {
       console.error("원본 텍스트 가져오기 실패:", error);
-      setIsLastText(true); // 오류가 발생해도 마지막 텍스트로 간주
+      setIsLastText(true);
     }
   };
 
@@ -59,7 +64,6 @@ function TestPage() {
   const onStop = async (recordedBlob) => {
     const formData = new FormData();
     formData.append("audio_file", recordedBlob.blob, "recording.webm");
-    formData.append("text_id", currentTextId); // 현재 텍스트 ID 추가
 
     try {
       setIsLoading(true);
@@ -72,8 +76,8 @@ function TestPage() {
 
       if (response.data) {
         setTranscript(response.data.text || "");
-        setReadableResult(response.data.readable_result || "");
-        setAudioUrl("http://127.0.0.1:8000" + response.data.audio_url);
+        setReadableResult(response.data.readable_result || ""); // readable_result 사용
+        setAudioUrl("http://127.0.0.1:8000" + response.data.audio_url); // 서버에서 반환된 오디오 파일 URL 저장
       }
     } catch (error) {
       console.error("오류 발생:", error);
@@ -104,20 +108,16 @@ function TestPage() {
   // 다음 문장 또는 결과 확인 버튼 핸들러
   const handleNextOrResult = () => {
     if (isLastText) {
-      // 마지막 문장이면 결과 확인 페이지로 이동
       navigate("/LastPage");
     } else {
-      // 다음 문장으로 넘어가기 전에 발음 결과 초기화
       setTranscript("");
       setReadableResult("");
-      setAudioUrl(null); // 오디오 URL도 초기화하여 다시 듣기 버튼을 비활성화
+      setAudioUrl(null);
       setCurrentTextId((prevId) => prevId + 1);
     }
   };
-
   return (
     <div className="flex min-h-screen justify-center bg-[#E7ECF2]">
-      {/* 로딩 중일 때 오버레이 표시 */}
       {isLoading && (
         <div className="loading-overlay">
           <div className="loading-spinner"></div>
@@ -125,9 +125,7 @@ function TestPage() {
       )}
 
       {/* Main Container */}
-      <div
-        className={`relative w-full max-w-lg overflow-hidden bg-white p-4 shadow-lg lg:mx-5 lg:my-5 lg:max-w-none lg:overflow-visible lg:rounded-lg ${isLoading ? "opacity-50" : ""}`}
-      >
+      <div className="relative w-full max-w-lg overflow-hidden bg-white p-4 shadow-lg lg:mx-5 lg:my-5 lg:max-w-none lg:overflow-visible lg:rounded-lg">
         {/* Top Icons */}
         <div className="mb-4 flex justify-center">
           <div className="flex space-x-2">
@@ -145,11 +143,13 @@ function TestPage() {
 
         {/* 메인 영역 */}
         <div className="flex flex-col items-center justify-center py-10">
-          <div className="text-25 mt-10 font-light lg:text-2xl">1/3</div>
+          <div className="text-25 mt-10 font-light lg:text-2xl">
+            {currentTextId}/{totalTexts}
+          </div>
 
           {/* 문장 제시 영역 */}
           <div className="mt-10 flex w-96 items-center justify-center rounded-lg bg-[#F2F2F2] p-5 shadow-lg lg:w-5/12">
-            <p className="text-20 break-words text-center font-medium text-black">
+            <p className="text-20 break-words text-center font-medium text-black lg:text-[20px]">
               {originalText || "문장이 제시됩니다."}
             </p>
           </div>
@@ -168,21 +168,19 @@ function TestPage() {
 
           {/* 발음 표시 영역 */}
           <div className="mt-12 grid w-96 grid-cols-1 justify-center gap-4 rounded-2xl bg-[#F2F2F2] shadow-lg lg:w-5/12">
-            <div className="text-20 flex items-center justify-center text-center font-medium text-black">
-              {isLoading ? (
-                <p className="mx-5 mt-5">텍스트 변환 중...</p>
-              ) : transcript ? (
-                <p className="mx-5 mt-5">{transcript}</p>
-              ) : (
-                <p className="mx-5 mt-5">
-                  녹음 시작 버튼을 눌러 발음 테스트를 시작하세요.
-                </p>
-              )}
+            <div className="text-20 flex items-center justify-center text-center font-medium text-black lg:text-[20px]">
+              <p className="mx-5 mt-5">
+                {isLoading
+                  ? "텍스트 변환 중..."
+                  : transcript
+                    ? transcript
+                    : "녹음 시작 버튼을 눌러 발음 테스트를 시작하세요."}
+              </p>
             </div>
 
             <hr className="mx-3 border-t-2 border-gray-300" />
 
-            <div className="text-20 flex items-center justify-center text-center font-medium text-black">
+            <div className="text-20 flex items-center justify-center text-center font-medium text-black lg:text-[20px]">
               {isLoading ? (
                 <p className="mx-5 mb-5">교정 결과 분석 중...</p>
               ) : readableResult ? (
@@ -201,9 +199,7 @@ function TestPage() {
           <button
             onClick={playAudio}
             disabled={!audioUrl}
-            className={`mt-3 flex text-blue-500 underline hover:text-blue-700 ${
-              !audioUrl ? "cursor-not-allowed" : ""
-            } ${!audioUrl ? "opacity-10" : ""}`}
+            className={`mt-3 flex text-[20px] text-blue-500 underline hover:text-blue-700 ${!audioUrl ? "cursor-not-allowed" : ""} ${!audioUrl ? "opacity-10" : ""}`}
           >
             <img
               src={playButton}
@@ -220,7 +216,7 @@ function TestPage() {
             <button
               onClick={startRecording}
               disabled={record}
-              className={`rounded px-4 py-2 ${
+              className={`rounded px-4 py-2 lg:text-[20px] ${
                 record ? "bg-gray-400" : "bg-blue-500 hover:bg-blue-600"
               } text-white`}
             >
@@ -229,7 +225,7 @@ function TestPage() {
             <button
               onClick={stopRecording}
               disabled={!record}
-              className={`rounded px-4 py-2 ${
+              className={`rounded px-4 py-2 lg:text-[20px] ${
                 !record ? "bg-gray-400" : "bg-red-500 hover:bg-red-600"
               } text-white`}
             >
@@ -238,27 +234,27 @@ function TestPage() {
             <button
               onClick={() => window.location.reload()}
               disabled={isLoading}
-              className="rounded bg-green-500 px-4 py-2 text-white hover:bg-green-600"
+              className="rounded bg-green-500 px-4 py-2 text-white hover:bg-green-600 lg:text-[20px]"
             >
               새로고침
             </button>
             <button
               onClick={handleNextOrResult}
-              className="rounded bg-pink-500 px-4 py-2 text-white hover:bg-pink-600"
+              className="rounded bg-pink-500 px-4 py-2 text-white hover:bg-pink-600 lg:text-[20px]"
             >
               {isLastText ? "결과 확인" : "다음 문장"}
             </button>
           </div>
-        </div>
 
-        {/* 나가기 버튼 */}
-        <div className="absolute bottom-5 right-5">
-          <button
-            className="text-blue-500 underline hover:text-blue-700"
-            onClick={() => navigate("/")}
-          >
-            나가기
-          </button>
+          {/* 나가기 버튼 */}
+          <div className="absolute bottom-5 right-5">
+            <button
+              className="text-blue-500 underline hover:text-blue-700 lg:text-[20px]"
+              onClick={() => navigate("/")}
+            >
+              나가기
+            </button>
+          </div>
         </div>
       </div>
     </div>
