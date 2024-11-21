@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const MainPage = () => {
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
 
   const Title = ({ children, className }) => (
     <div className={`font-Pretendard text-[40px] font-[700] ${className}`}>
@@ -10,8 +11,26 @@ const MainPage = () => {
     </div>
   );
 
+  const handleReset = async () => {
+    try {
+      setIsLoading(true);
+      // 2초 후 TestPage로 이동
+      setTimeout(() => {
+        navigate("/TestPage");
+      }, 2000);
+    } catch (error) {
+      console.error("초기화 실패:", error);
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="flex min-h-screen justify-center bg-[#E7ECF2]">
+      {isLoading && (
+        <div className="loading-overlay">
+          <div className="loading-spinner"></div>
+        </div>
+      )}
       {/* Main Container */}
       <div className="relative w-full max-w-lg overflow-hidden bg-white p-4 shadow-lg lg:mx-5 lg:my-5 lg:max-w-none lg:overflow-visible lg:rounded-lg">
         {/* Top Icons */}
@@ -30,21 +49,22 @@ const MainPage = () => {
         </div>
 
         {/* 메인 영역 */}
-        <div className="mt-60 flex flex-col items-center justify-center py-10">
-          <Title className="text-center lg:hidden">AI Pronunciation</Title>
-          <Title className="text-center lg:hidden">Assistant</Title>
-          <div className="hidden text-center lg:block lg:font-Pretendard lg:text-[40px] lg:font-[700]">
-            AI Pronunciation Assistant
-          </div>
-          <div className="mt-5 font-Pretendard text-[20px] font-[500]">
+        <div className="mt-64 flex flex-col items-center justify-center py-10">
+          <Title className="text-center lg:hidden">AI 발음 교정 서비스</Title>
+          <div className="hidden text-center lg:block lg:font-Pretendard lg:text-[50px] lg:font-[700]">
             AI 발음 교정 서비스
+          </div>
+          <div className="mt-2 font-Pretendard text-[20px] font-[500]">
+            📢 AI Pronunciation Assistant
           </div>
 
           {/* 하단 영역 (버튼) */}
           <div className="absolute bottom-[80px] mx-14">
             <button
-              className="h-[56px] w-[392px] rounded-2xl bg-slate-800 font-Pretendard text-[20px] font-[700] text-white"
-              onClick={() => navigate("/TestPage")}
+              className={`h-[56px] w-[392px] rounded-lg bg-slate-800 font-Pretendard text-[20px] font-[700] text-white hover:bg-blue-600 ${
+                isLoading ? "cursor-not-allowed opacity-50" : ""
+              }`}
+              onClick={handleReset}
             >
               발음 테스트 시작하기
             </button>

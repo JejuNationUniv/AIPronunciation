@@ -24,25 +24,44 @@ audio {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.8);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999; /* 페이지의 모든 요소 위에 위치하게 설정 */
+  z-index: 1000;
 }
 
 .loading-spinner {
-  border: 8px solid #f3f3f3; /* Light grey */
-  border-top: 8px solid #3498db; /* Blue */
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
-  width: 60px;
-  height: 60px;
-  animation: spin 1s linear infinite;
+  background: radial-gradient(circle at 30% 30%, #66a6ff, #89f7fe);
+  animation: flowingSpin 1.8s cubic-bezier(0.25, 1, 0.5, 1) infinite;
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+@keyframes flowingSpin {
+  0% {
+    transform: scale(1) translateY(0);
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  25% {
+    transform: scale(1.1) translateY(-10px);
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.15);
+  }
+  50% {
+    transform: scale(1) translateY(0);
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  75% {
+    transform: scale(1.1) translateY(10px);
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.15);
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  }
 }
+
+
