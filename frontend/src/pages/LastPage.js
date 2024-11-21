@@ -6,6 +6,7 @@ const LastPage = () => {
   const navigate = useNavigate();
   const [accuracy, setAccuracy] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchAccuracy = async () => {
@@ -42,6 +43,14 @@ const LastPage = () => {
     }
   };
 
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
   return (
     <div className="flex min-h-screen justify-center bg-[#E7ECF2]">
       {/* Main Container */}
@@ -60,9 +69,9 @@ const LastPage = () => {
           </div>
 
           {/* 하단 영역 (버튼) */}
-          <div className="absolute bottom-[80px] mx-14">
+          <div className="absolute bottom-[80px] mx-14 flex space-x-4">
             <button
-              className={`h-[56px] w-[392px] rounded-2xl bg-slate-800 font-Pretendard text-[20px] font-[700] text-white ${
+              className={`h-[56px] w-[192px] rounded-2xl bg-slate-800 font-Pretendard text-[20px] font-[700] text-white ${
                 isLoading ? "cursor-not-allowed opacity-50" : ""
               }`}
               onClick={handleReset}
@@ -70,9 +79,38 @@ const LastPage = () => {
             >
               {isLoading ? "이동중..." : "다시 도전하기!"}
             </button>
+            <button
+              className="h-[56px] w-[192px] rounded-2xl bg-gray-500 font-Pretendard text-[20px] font-[700] text-white hover:bg-gray-600"
+              onClick={openModal}
+            >
+              더 연습하러 가기
+            </button>
           </div>
         </div>
       </div>
+
+      {/* 모달 창 */}
+      {isModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="w-11/12 max-w-md rounded-lg bg-white p-6">
+            <h2 className="mb-4 text-center font-Pretendard text-[24px] font-[700]">
+              곧 추가될 기능입니다! 👽
+            </h2>
+            <p className="mb-6 text-center font-Pretendard text-[16px] font-[400]">
+              더 많은 연습 기능이 곧 제공될 예정입니다.
+              <br /> 많은 기대 부탁드려요!
+            </p>
+            <div className="flex justify-center">
+              <button
+                className="rounded-lg bg-blue-500 px-6 py-1 font-Pretendard text-[15px] font-[700] text-white hover:bg-blue-600"
+                onClick={closeModal}
+              >
+                닫기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
