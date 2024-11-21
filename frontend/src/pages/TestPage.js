@@ -10,13 +10,14 @@ function TestPage() {
 
   const [record, setRecord] = useState(false);
   const [transcript, setTranscript] = useState("");
-  const [readableResult, setReadableResult] = useState(""); // readable_result 사용
+  const [readableResult, setReadableResult] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [originalText, setOriginalText] = useState("");
-  const [audioUrl, setAudioUrl] = useState(null); // 오디오 파일 URL 상태 추가
+  const [audioUrl, setAudioUrl] = useState(null);
   const [currentTextId, setCurrentTextId] = useState(1);
   const [isLastText, setIsLastText] = useState(false);
   const totalTexts = 3;
+  const [coloredAnalysis, setColoredAnalysis] = useState("");
 
   // 원본 텍스트 가져오기
   useEffect(() => {
@@ -76,8 +77,9 @@ function TestPage() {
 
       if (response.data) {
         setTranscript(response.data.text || "");
-        setReadableResult(response.data.readable_result || ""); // readable_result 사용
-        setAudioUrl("http://127.0.0.1:8000" + response.data.audio_url); // 서버에서 반환된 오디오 파일 URL 저장
+        setReadableResult(response.data.readable_result || "");
+        setColoredAnalysis(response.data.colored_analysis || "");
+        setAudioUrl("http://127.0.0.1:8000" + response.data.audio_url);
       }
     } catch (error) {
       console.error("오류 발생:", error);
@@ -107,15 +109,26 @@ function TestPage() {
 
   // 다음 문장 또는 결과 확인 버튼 핸들러
   const handleNextOrResult = () => {
+    // 녹음 상태 초기화
+    handleRefreshRecordingState();
+
     if (isLastText) {
       navigate("/LastPage");
     } else {
-      setTranscript("");
-      setReadableResult("");
-      setAudioUrl(null);
       setCurrentTextId((prevId) => prevId + 1);
     }
   };
+
+  // 녹음 상태와 관련된 항목만 초기화하는 함수
+  const handleRefreshRecordingState = () => {
+    setRecord(false); // 녹음을 중지하고 초기화
+    setTranscript(""); // 기록된 텍스트 삭제
+    setReadableResult(""); // 읽을 수 있는 결과 삭제
+    setAudioUrl(null); // 오디오 파일 URL 초기화
+    setColoredAnalysis(""); // 발음 교정 결과 초기화
+    setIsLoading(false); // 로딩 상태도 false로 초기화
+  };
+
   return (
     <div className="flex min-h-screen justify-center bg-[#E7ECF2]">
       {isLoading && (
@@ -143,7 +156,7 @@ function TestPage() {
 
         {/* 메인 영역 */}
         <div className="flex flex-col items-center justify-center py-10">
-          <div className="text-25 mt-10 font-light lg:text-2xl">
+          <div className="text-25 mt-1 font-light lg:text-2xl">
             {currentTextId}/{totalTexts}
           </div>
 
@@ -183,23 +196,82 @@ function TestPage() {
             <div className="text-20 flex items-center justify-center text-center font-medium text-black lg:text-[20px]">
               {isLoading ? (
                 <p className="mx-5 mb-5">교정 결과 분석 중...</p>
-              ) : readableResult ? (
-                // HTML 렌더링
+              ) : coloredAnalysis ? (
+                // HTML을 렌더링하면서 빨간색 텍스트 제거
                 <p
-                  className="mx-5 mb-5"
-                  dangerouslySetInnerHTML={{ __html: readableResult }}
+                  className="mx-5"
+                  dangerouslySetInnerHTML={{
+                    __html: coloredAnalysis
+                      .replace("분석 결과: ", "")
+                      .replace(/<span style="color:red">.*?<\/span>/g, ""), // 빨간색 텍스트 제거
+                  }}
                 />
               ) : (
                 <p className="mx-5 mb-5">여기에 수정된 발음이 표시됩니다.</p>
               )}
             </div>
+
+            {/* 교정 결과 분석 표시 영역 */}
+            {coloredAnalysis && (
+              <div className="text-20 mb-5 items-center justify-center text-center font-medium text-black lg:text-[18px]">
+                {isLoading ? (
+                  <p className="">교정 결과 분석 중...</p>
+                ) : (
+                  <>
+                    {/* 누락된 발음 */}
+                    <div className="flex w-full justify-center text-center text-purple-800">
+                      <p className="font-semibold">누락된 발음:</p>
+                      <div
+                        dangerouslySetInnerHTML={{
+                          __html: coloredAnalysis
+                            .replace("분석 결과: ", "") // "분석 결과:" 부분 제거
+                            .split("</span>")
+                            .filter((segment) =>
+                              segment.includes("color:purple"),
+                            )
+                            .join("</span>"),
+                        }}
+                      />
+                    </div>
+                    {/* 틀린 발음 */}
+                    <div className="flex w-full justify-center text-center text-red-600">
+                      <p className="font-semibold">틀린 발음:</p>
+                      <div
+                        dangerouslySetInnerHTML={{
+                          __html: coloredAnalysis
+                            .split("</span>")
+                            .filter((segment) => segment.includes("color:red"))
+                            .join("</span>"),
+                        }}
+                      />
+                    </div>
+                    {/* 정확한 문장 */}
+                    <div className="flex w-full justify-center text-center text-black">
+                      <p className="font-semibold">정확한 문장:</p>
+                      <div
+                        dangerouslySetInnerHTML={{
+                          __html: coloredAnalysis
+                            .split("</span>")
+                            .filter((segment) =>
+                              segment.includes("color:black"),
+                            )
+                            .join("</span>"),
+                        }}
+                      />
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
           </div>
 
           {/* 다시 듣기 버튼 */}
           <button
             onClick={playAudio}
             disabled={!audioUrl}
-            className={`mt-3 flex text-[20px] text-blue-500 underline hover:text-blue-700 ${!audioUrl ? "cursor-not-allowed" : ""} ${!audioUrl ? "opacity-10" : ""}`}
+            className={`mt-5 flex text-[20px] text-blue-500 underline hover:text-blue-700 ${
+              !audioUrl ? "cursor-not-allowed" : ""
+            } ${!audioUrl ? "opacity-10" : ""}`}
           >
             <img
               src={playButton}
@@ -232,7 +304,7 @@ function TestPage() {
               녹음 중지
             </button>
             <button
-              onClick={() => window.location.reload()}
+              onClick={handleRefreshRecordingState}
               disabled={isLoading}
               className="rounded bg-green-500 px-4 py-2 text-white hover:bg-green-600 lg:text-[20px]"
             >
