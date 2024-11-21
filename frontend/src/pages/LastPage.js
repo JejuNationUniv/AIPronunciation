@@ -64,11 +64,11 @@ const LastPage = () => {
   const getMessage = () => {
     const percentage = (100 - accuracy).toFixed(2);
     if (percentage > 0 && percentage <= 10) {
-      return "당신은 발음이 아주 좋군요!";
+      return "당신은 발음이 아주 좋군요! 😍";
     } else if (percentage > 10 && percentage <= 40) {
       return "WOW! 열심히 연습하면 더 좋아질 거에요! 👍";
     } else if (percentage > 40 && percentage <= 70) {
-      return "저희와 함께 발음 연습을 해볼까요?";
+      return "저희와 함께 발음 연습을 해볼까요? 🎤";
     } else if (percentage > 70 && percentage <= 99) {
       return "발음 향상을 위해 조금 더 연습해봐요! 화이팅! 💪";
     } else {
