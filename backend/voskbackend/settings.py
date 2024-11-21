@@ -65,9 +65,9 @@ WSGI_APPLICATION = 'voskbackend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'vosk_voice',
-        'USER' : 'root',
-        'PASSWORD' : '1388', # 설정한 비밀번호로 적어주면 된다.
+        'NAME': 'aipronunciation',
+        'USER' : 'kimminsu',
+        'PASSWORD' : '1300', # 설정한 비밀번호로 적어주면 된다.
         'HOST' : '127.0.0.1',
         'PORT' : '3306',
     }
@@ -112,4 +112,5 @@ VOSK_MODEL_PATH = os.path.join(MEDIA_ROOT, 'models', 'vosk-model-small-ko-0.22')
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',  # 프런트엔드 서버 URL
+    "http://127.0.0.1:3000",  # 프론트엔드 URL 추가
 ]
