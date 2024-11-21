@@ -112,4 +112,5 @@ VOSK_MODEL_PATH = os.path.join(MEDIA_ROOT, 'models', 'vosk-model-small-ko-0.22')
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',  # 프런트엔드 서버 URL
+    "http://127.0.0.1:3000",  # 프론트엔드 URL 추가
 ]
